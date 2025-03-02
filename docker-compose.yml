@@ -3,6 +3,8 @@ services:
     build: .
     ports:
       - "8009:8009"
+    volumes:
+      - /etc/hosts:/etc/hosts:ro
     depends_on:
       - mongodb_local
     env_file:
