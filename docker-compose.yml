@@ -1,0 +1,26 @@
+services:
+  app_score:
+    build: .
+    ports:
+      - "8009:8009"
+    depends_on:
+      - mongodb_local
+    env_file:
+      .env
+    restart: always
+
+  mongodb_local:
+    # 不支持AVX的MongoDB版本
+    # image: mongo:4.4.29-ubuntu2004
+    image: mongo:4.4
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data_local:/data/db
+    restart: always
+
+volumes:
+  mongodb_data_local:
+
+
+

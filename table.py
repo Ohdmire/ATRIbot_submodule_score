@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pymongo import MongoClient
-from config import remote_mongodb_uri
+from config import remote_mongodb_uri,local_mongodb_uri
 
 app = FastAPI()
 
 # 本地 MongoDB 配置
-LOCAL_MONGO_URI = "mongodb://localhost:27018/"
+LOCAL_MONGO_URI = local_mongodb_uri
 LOCAL_DB_NAME = "osu"
 LOCAL_COLLECTION_UNRANKSCORE = "unrankscore"
 LOCAL_COLLECTION_BIND = "bind"
@@ -35,7 +35,7 @@ def sync_remote_bind_to_local():
 
         # 遍历远程文档
         for doc in remote_bind_docs:
-            print(doc)
+
             # 检查本地是否存在相同 id 的文档
             local_doc = local_collection_bind.find_one({"id": doc["id"]})
 
