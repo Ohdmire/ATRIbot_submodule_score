@@ -51,11 +51,13 @@ async def read_root():
 async def fetch_all_user_scores():
     users_list = get_all_users_id()
     await job_get_pr_info(users_list)
+    return 'finished'
 
 @app.get("/sync")
 @app.post("/sync")
 async def sync():
-    sync_remote_bind_to_local()
+    result = sync_remote_bind_to_local()
+    return result
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=8009, reload=True, timeout_keep_alive=120)
