@@ -10,6 +10,9 @@ import logging
 
 scheduler = AsyncIOScheduler()
 
+# 设置日志级别和格式
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 async def check_url_status(url: str):
     try:
         async with aiohttp.ClientSession as session:
@@ -49,11 +52,13 @@ app = FastAPI(lifespan=app_lifespan)
 async def fetch_all_user_scores():
     users_list = get_all_users_id()
     await job_get_pr_info(users_list)
+    logging.info("已执行抓取操作")
     return 'finished'
 
 @app.api_route("/sync", methods=["GET", "POST"])
 async def sync():
     result = sync_remote_bind_to_local()
+    logging.info("已同步bind表")
     return result
 
 if __name__ == '__main__':

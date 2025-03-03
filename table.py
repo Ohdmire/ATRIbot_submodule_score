@@ -1,8 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import HTTPException
 from pymongo import MongoClient
 from config import remote_mongodb_uri,local_mongodb_uri
-
-app = FastAPI()
 
 # 本地 MongoDB 配置
 LOCAL_MONGO_URI = local_mongodb_uri
