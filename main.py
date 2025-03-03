@@ -44,19 +44,13 @@ async def app_lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=app_lifespan)
 
-@app.get("/")
-async def read_root():
-    return {"message": "FastAPI定时器运行中"}
-
-@app.get("/trigger")
-@app.post("/trigger")
+@app.api_route("/trigger", methods=["GET", "POST"])
 async def fetch_all_user_scores():
     users_list = get_all_users_id()
     await job_get_pr_info(users_list)
     return 'finished'
 
-@app.get("/sync")
-@app.post("/sync")
+@app.api_route("/sync", methods=["GET", "POST"])
 async def sync():
     result = sync_remote_bind_to_local()
     return result
