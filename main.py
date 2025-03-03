@@ -31,12 +31,12 @@ def job_refresh_token():
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
+    print("亚托莉子模块，启动")
     # 添加定时任务，每60秒执行一次
     scheduler.add_job(refresh_token, 'interval', seconds=3600)
     scheduler.add_job(fetch_all_user_scores, 'cron', hour='8,16,0')
     scheduler.add_job(sync, 'cron', hour='7,15,23')
     scheduler.start()
-    print("亚托莉子模块，启动")
     yield
     # 关闭调度器
     scheduler.shutdown()
