@@ -36,9 +36,11 @@ async def app_lifespan(app: FastAPI):
     scheduler.add_job(fetch_all_user_scores, 'cron', hour='8,16,0')
     scheduler.add_job(sync, 'cron', hour='7,15,23')
     scheduler.start()
+    print("亚托莉子模块，启动")
     yield
     # 关闭调度器
     scheduler.shutdown()
+    print("亚托莉子模块，关闭")
 
 app = FastAPI(lifespan=app_lifespan)
 
