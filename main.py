@@ -6,6 +6,7 @@ import uvicorn
 from api import refresh_token,job_get_pr_info
 from table import get_all_users_id
 from table import sync_remote_bind_to_local
+import logging
 
 scheduler = AsyncIOScheduler()
 
@@ -31,7 +32,7 @@ def job_refresh_token():
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
-    print("亚托莉子模块，启动")
+    logging.info("亚托莉子模块，启动")
     # 添加定时任务，每60秒执行一次
     scheduler.add_job(refresh_token, 'interval', seconds=3600)
     scheduler.add_job(fetch_all_user_scores, 'cron', hour='8,16,0')
@@ -40,7 +41,7 @@ async def app_lifespan(app: FastAPI):
     yield
     # 关闭调度器
     scheduler.shutdown()
-    print("亚托莉子模块，关闭")
+    logging.info("亚托莉子模块，关闭")
 
 app = FastAPI(lifespan=app_lifespan)
 
