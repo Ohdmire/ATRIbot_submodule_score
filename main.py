@@ -5,7 +5,7 @@ import aiohttp
 import uvicorn
 from api import refresh_token,job_get_pr_info
 from table import get_all_users_id
-from table import sync_remote_bind_to_local,push_uspush_to_remote
+from table import sync_remote_bind_to_local,push_uspush_to_remote,pull_remote_unrankscore_to_local
 import logging
 
 scheduler = AsyncIOScheduler()
@@ -54,7 +54,11 @@ async def fetch_all_user_scores():
     await job_get_pr_info(users_list)
     logging.info("已执行抓取操作")
     result2 = push_uspush_to_remote()
-    logging.info("已同步us表到Remote")
+    logging.info(result2)
+    logging.info("已推送us表到Remote")
+    result3 = pull_remote_unrankscore_to_local()
+    logging.info(result3)
+    logging.info("已拉取us表到本地")
     return 'finished'
 
 @app.api_route("/sync", methods=["GET", "POST"])

@@ -54,8 +54,36 @@ def sync_remote_bind_to_local():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+def pull_remote_unrankscore_to_local():
+
+    count_unrankscore_pulled = 0
+
+    try:
+        # 从远程 MongoDB 获取所有 bind 文档
+        remote_unrankscore_docs = remote_collection_unrankscore.find()
+
+        # 遍历远程文档
+        for doc in remote_unrankscore_docs:
+            doc.pop('_id', None) # 清除可能冲突的字段
+            local_doc = local_collection_unrankscore.find_one({"id": doc["id"]})
+
+            if local_doc:
+                # 如果存在，什么都不做
+                pass
+            else:
+                # 如果不存在，插入新文档
+                local_collection_unrankscore.insert_one(doc)
+                count_unrankscore_pulled +=1
+
+        return {"status": "success", "message": "Pull remote successfully.","data":count_unrankscore_pulled}
+    
+    except Exception as e:
+            raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 def push_uspush_to_remote():
+
+    count_unrankscore_pushed = 0
+
     try:
         local_uspush_docs = local_collection_uspush.find()
 
@@ -64,7 +92,8 @@ def push_uspush_to_remote():
             remote_collection_unrankscore.update_one({"id": doc["id"]}, {"$set": doc})
             # 完成后删除本地的
             local_collection_uspush.delete_one({"id": doc["id"]})
-        return {"status": "success", "message": "Sync to Remote completed successfully."}
+            count_unrankscore_pushed +=1
+        return {"status": "success", "message": "Sync to Remote completed successfully.","data":count_unrankscore_pushed}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
