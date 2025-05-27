@@ -70,7 +70,7 @@ def pull_remote_unrankscore_to_local():
         to_insert_ids = list(local_collection_unrankscore.distinct(
             "id", {"id": {"$nin": remote_ids}}
         ))
-
+        logging.info(f'to insert ids{to_insert_ids}')
         for i in to_insert_ids:
             new_doc = remote_collection_unrankscore.find_one({"id": i})
             new_doc.pop('_id', None) # 清除可能冲突的字段
@@ -99,6 +99,7 @@ def push_uspush_to_remote():
         to_push_ids = list(local_collection_uspush.distinct(
             "id", {"id": {"$nin": remote_ids}}
         ))
+        logging.info(f'to push ids{to_push_ids}')
         for i in to_push_ids:
             new_doc = local_collection_uspush.find_one({"id": i})
             new_doc.pop('_id', None) # 清除可能冲突的字段
