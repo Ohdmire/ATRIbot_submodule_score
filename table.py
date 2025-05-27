@@ -59,21 +59,20 @@ def pull_remote_unrankscore_to_local():
     count_unrankscore_pulled = 0
 
     try:
-        # 从远程 MongoDB 获取所有 bind 文档
-        remote_unrankscore_docs = remote_collection_unrankscore.find()
 
-        # 遍历远程文档
-        for doc in remote_unrankscore_docs:
-            doc.pop('_id', None) # 清除可能冲突的字段
-            local_doc = local_collection_unrankscore.find_one({"id": doc["id"]})
+        # 批量获取所有远程ID
+        remote_ids = list(remote_collection_unrankscore.distinct("id"))
+        
+        # 批量查询本地已存在的ID
+        to_insert_ids = list(local_collection_unrankscore.distinct(
+            "id", {"id": {"$nin": remote_ids}}
+        ))
 
-            if local_doc:
-                # 如果存在，什么都不做
-                pass
-            else:
-                # 如果不存在，插入新文档
-                local_collection_unrankscore.insert_one(doc)
-                count_unrankscore_pulled +=1
+        for i in to_insert_ids:
+            new_doc = remote_collection_unrankscore.find_one({"id": i})
+            new_doc.pop('_id', None) # 清除可能冲突的字段
+            local_collection_unrankscore.insert_one(new_doc)
+            count_unrankscore_pulled +=1
 
         return {"status": "success", "message": "Pull remote successfully.","data":count_unrankscore_pulled}
     
@@ -85,14 +84,24 @@ def push_uspush_to_remote():
     count_unrankscore_pushed = 0
 
     try:
-        local_uspush_docs = local_collection_uspush.find()
 
-        for doc in local_uspush_docs:
-            doc.pop('_id', None) # 清除可能冲突的字段
-            remote_collection_unrankscore.update_one({"id": doc["id"]}, {"$set": doc})
-            # 完成后删除本地的
-            local_collection_uspush.delete_one({"id": doc["id"]})
+        # 批量获取远程ID
+        remote_ids = list(remote_collection_unrankscore.distinct("id"))
+        
+        # 批量查询本地已存在的ID
+        # 返回不在远程的所有来自local_uspush的score id
+        to_push_ids = list(local_collection_uspush.distinct(
+            "id", {"id": {"$nin": remote_ids}}
+        ))
+        for i in to_push_ids:
+            new_doc = local_collection_uspush.find_one({"id": i})
+            new_doc.pop('_id', None) # 清除可能冲突的字段
+            remote_collection_unrankscore.insert_one(new_doc)
             count_unrankscore_pushed +=1
+
+        # 最后没有任何问题drop掉待push的表
+        local_collection_uspush.delete_many({})
+
         return {"status": "success", "message": "Sync to Remote completed successfully.","data":count_unrankscore_pushed}
 
     except Exception as e:
