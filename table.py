@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from pymongo import MongoClient
 from config import remote_mongodb_uri,local_mongodb_uri
+import logging
 
 # 本地 MongoDB 配置
 LOCAL_MONGO_URI = local_mongodb_uri
@@ -77,7 +78,8 @@ def pull_remote_unrankscore_to_local():
         return {"status": "success", "message": "Pull remote successfully.","data":count_unrankscore_pulled}
     
     except Exception as e:
-            raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 def push_uspush_to_remote():
 
@@ -105,6 +107,7 @@ def push_uspush_to_remote():
         return {"status": "success", "message": "Sync to Remote completed successfully.","data":count_unrankscore_pushed}
 
     except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
