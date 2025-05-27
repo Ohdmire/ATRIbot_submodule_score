@@ -50,9 +50,9 @@ app = FastAPI(lifespan=app_lifespan)
 
 @app.api_route("/trigger", methods=["GET", "POST"])
 async def fetch_all_user_scores():
-    # users_list = get_all_users_id()
-    # await job_get_pr_info(users_list)
-    # logging.info("已执行抓取操作")
+    users_list = get_all_users_id()
+    await job_get_pr_info(users_list)
+    logging.info("已执行抓取操作")
     result2 = push_uspush_to_remote()
     logging.info(result2)
     logging.info("已推送us表到Remote")
