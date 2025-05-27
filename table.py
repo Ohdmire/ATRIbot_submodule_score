@@ -58,6 +58,8 @@ def sync_remote_bind_to_local():
 def pull_remote_unrankscore_to_local():
 
     count_unrankscore_pulled = 0
+    to_insert_ids = []
+    remote_ids = []
 
     try:
 
@@ -84,12 +86,14 @@ def pull_remote_unrankscore_to_local():
 def push_uspush_to_remote():
 
     count_unrankscore_pushed = 0
+    to_push_ids = []
+    remote_ids = []
 
     try:
 
         # 批量获取远程ID
         remote_ids = list(remote_collection_unrankscore.distinct("id"))
-        
+
         # 批量查询本地已存在的ID
         # 返回不在远程的所有来自local_uspush的score id
         to_push_ids = list(local_collection_uspush.distinct(
