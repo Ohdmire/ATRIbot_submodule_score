@@ -37,6 +37,7 @@ def sync_remote_bind_to_local():
 
         # 遍历远程文档
         for doc in remote_bind_docs:
+            doc.pop('_id', None) # 清除可能冲突的字段
 
             # 检查本地是否存在相同 id 的文档
             local_doc = local_collection_bind.find_one({"id": doc["id"]})
@@ -59,6 +60,7 @@ def push_uspush_to_remote():
         local_uspush_docs = local_collection_uspush.find()
 
         for doc in local_uspush_docs:
+            doc.pop('_id', None) # 清除可能冲突的字段
             remote_collection_unrankscore.update_one({"id": doc["id"]}, {"$set": doc})
             # 完成后删除本地的
             local_collection_uspush.delete_one({"id": doc["id"]})
