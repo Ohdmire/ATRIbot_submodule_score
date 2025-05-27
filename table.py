@@ -60,18 +60,15 @@ def pull_remote_unrankscore_to_local():
     count_unrankscore_pulled = 0
     try:
 
-        # 批量获取所有远程ID
-        remote_ids = list(remote_collection_unrankscore.distinct("id"))
+        # 批量获取本地ID
+        local_ids = list(local_collection_unrankscore.distinct("id"))
         
         # 返回不在本地 在远程的score id
-        to_insert_ids = list(local_collection_unrankscore.distinct(
-            "id", {"id": {"$nin": remote_ids}}
+        to_insert_ids = list(remote_collection_unrankscore.distinct(
+            "id", {"id": {"$nin": local_ids}}
         ))
-        logging.info(f'to insert ids{to_insert_ids}')
         for i in to_insert_ids:
             new_doc = remote_collection_unrankscore.find_one({"id": i})
-            if new_doc is None:
-                logging.error(f'error id{i}')
             new_doc.pop('_id', None) # 清除可能冲突的字段
             local_collection_unrankscore.update_one({"id":new_doc["id"]},{"$set": new_doc},upsert=True)
             count_unrankscore_pulled +=1
@@ -95,7 +92,6 @@ def push_uspush_to_remote():
         to_push_ids = list(local_collection_uspush.distinct(
             "id", {"id": {"$nin": remote_ids}}
         ))
-        logging.info(f'to push ids{to_push_ids}')
         for i in to_push_ids:
             new_doc = local_collection_uspush.find_one({"id": i})
             new_doc.pop('_id', None) # 清除可能冲突的字段
